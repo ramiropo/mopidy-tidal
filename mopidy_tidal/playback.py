@@ -4,6 +4,8 @@ import logging
 
 from mopidy import backend
 
+from tidalapi.media import Track
+
 logger = logging.getLogger(__name__)
 
 
@@ -13,6 +15,7 @@ class TidalPlaybackProvider(backend.PlaybackProvider):
         logger.info("TIDAL uri: %s", uri)
         parts = uri.split(':')
         track_id = int(parts[4])
-        newurl = self.backend._session.get_media_url(track_id)
+        track = Track(self.backend._session, track_id)
+        newurl = track.get_url()
         logger.info("transformed into %s", newurl)
         return newurl

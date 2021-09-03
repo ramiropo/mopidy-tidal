@@ -11,6 +11,10 @@ from mopidy_tidal.full_models_mappers import create_mopidy_albums, \
 
 from mopidy_tidal.utils import remove_watermark
 
+import tidalapi.media
+import tidalapi.artist
+import tidalapi.album
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,13 +65,13 @@ class TidalSearchThread(Thread):
 
     def run(self):
         if self.kind == "artist":
-            artists = self.session.search("artist", self.keyword).artists
+            artists = self.session.search(self.keyword, (tidalapi.artist.Artist,))['artists']
             self.results = create_mopidy_artists(artists)
         elif self.kind == "album":
-            albums = self.session.search("album", self.keyword).albums
+            albums = self.session.search(self.keyword, (tidalapi.album.Album,))['albums']
             self.results = create_mopidy_albums(albums)
         elif self.kind == "track":
-            tracks = self.session.search("track", self.keyword).tracks
+            tracks = self.session.search(self.keyword, (tidalapi.media.Track,))['tracks']
             self.results = create_mopidy_tracks(tracks)
 
 
@@ -88,7 +92,7 @@ class TidalExactSearchThread(TidalSearchThread):
         self.results = self.artists, self.albums, self.tracks
 
     def search_album(self):
-        res = self.session.search("album", self.keyword).albums
+        res = self.session.search(self.keyword, (tidalapi.album.Album,))['albums']
         album = next((a for a in res
                       if a.name.lower() == self.keyword.lower()), None)
         logger.info("Album not found" if album is None else "Album found OK")
@@ -99,7 +103,7 @@ class TidalExactSearchThread(TidalSearchThread):
             logger.info("Found %d tracks for album", len(self.tracks))
 
     def search_artist(self):
-        res = self.session.search("artist", self.keyword).artists
+        res = self.session.search(self.keyword, (tidalapi.artist.Artist,))['artists']
         logger.info("Found %d artists", len(res))
         for artist in res:
             if artist.name.lower() == self.keyword.lower():

@@ -18,10 +18,12 @@ from mopidy_tidal.search import tidal_search
 
 from mopidy_tidal.utils import apply_watermark
 
+from tidalapi.artist import Artist
+
 
 logger = logging.getLogger(__name__)
 
-class Cache(OrderedDict): 
+class Cache(OrderedDict):
     '''cache class, requires python3 style (ordered) dicts'''
     max_items = 1000
     def __setitem__(self, key, value):
@@ -244,5 +246,6 @@ class TidalLibraryProvider(backend.LibraryProvider):
 
     def _lookup_artist(self, session, parts):
         artist_id = parts[2]
-        artist_tracks = session.get_artist_top_tracks(artist_id)
+        artist = Artist(session, artist_id)
+        artist_tracks = artist.get_top_tracks()
         return full_models_mappers.create_mopidy_tracks(artist_tracks)
