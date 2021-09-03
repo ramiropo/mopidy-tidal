@@ -106,6 +106,7 @@ class TidalExactSearchThread(TidalSearchThread):
         res = self.session.search(self.keyword, (tidalapi.artist.Artist,))['artists']
         logger.info("Found %d artists", len(res))
         for artist in res:
+            logger.info("Comparing %s.", artist.name)
             if artist.name.lower() == self.keyword.lower():
                 logger.info("Artist match OK")
                 self.artists = create_mopidy_artists([artist])

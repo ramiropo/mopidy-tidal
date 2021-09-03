@@ -7,6 +7,7 @@ import logging
 from mopidy import backend, models
 
 from mopidy.models import Image, SearchResult
+from tidalapi.album import Album
 
 from mopidy_tidal import full_models_mappers
 
@@ -241,7 +242,8 @@ class TidalLibraryProvider(backend.LibraryProvider):
 
     def _lookup_album(self, session, parts):
         album_id = parts[2]
-        tracks = session.get_album_tracks(album_id)
+        album = Album(session, album_id)
+        tracks = album.tracks
         return full_models_mappers.create_mopidy_tracks(tracks)
 
     def _lookup_artist(self, session, parts):
