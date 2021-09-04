@@ -20,6 +20,7 @@ from mopidy_tidal.search import tidal_search
 from mopidy_tidal.utils import apply_watermark
 
 from tidalapi.artist import Artist
+from tidalapi.playlist import Playlist
 
 
 logger = logging.getLogger(__name__)
@@ -178,8 +179,8 @@ class TidalLibraryProvider(backend.LibraryProvider):
                     album_id = parts[2]
                     img_uri = self.lru_album_img.hit(album_id)
                     if img_uri is None:
-                        album = session.get_album(album_id)
-                        img_uri = album.image
+                        album = Album(session, album_id)
+                        img_uri = album.image(160)
                         self.lru_album_img[album_id] = img_uri
 
                     uri_images = [Image(uri=img_uri, width=512, height=512)]
@@ -225,7 +226,8 @@ class TidalLibraryProvider(backend.LibraryProvider):
         return tracks
 
     def _lookup_playlist(self, session, parts):
-        tracks = session.get_playlist_tracks(parts[2])
+        playlist = Playlist(session, parts[2])
+        tracks = playlist.tracks()
         return full_models_mappers.create_mopidy_tracks(tracks)
 
     def _lookup_track(self, session, parts):
@@ -243,7 +245,7 @@ class TidalLibraryProvider(backend.LibraryProvider):
     def _lookup_album(self, session, parts):
         album_id = parts[2]
         album = Album(session, album_id)
-        tracks = album.tracks
+        tracks = album.tracks()
         return full_models_mappers.create_mopidy_tracks(tracks)
 
     def _lookup_artist(self, session, parts):
