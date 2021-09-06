@@ -27,7 +27,7 @@ class Extension(ext.Extension):
 
     def get_config_schema(self):
         schema = super(Extension, self).get_config_schema()
-        schema['quality'] = config.String(choices=["LOSSLESS", "HIGH", "LOW"])
+        schema['quality'] = config.String(choices=["HI_RES", "LOSSLESS", "HIGH", "LOW"])
         return schema
 
     def setup(self, registry):
