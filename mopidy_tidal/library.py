@@ -170,8 +170,8 @@ class TidalLibraryProvider(backend.LibraryProvider):
                     artist_id = parts[2]
                     img_uri = self.lru_artist_img.hit(artist_id)
                     if img_uri is None:
-                        artist = session.get_artist(artist_id)
-                        img_uri = artist.image
+                        artist = Artist(session, artist_id)
+                        img_uri = artist.image(320)
                         self.lru_artist_img[artist.id] = img_uri
 
                     uri_images = [Image(uri=img_uri, width=512, height=512)]
@@ -180,7 +180,7 @@ class TidalLibraryProvider(backend.LibraryProvider):
                     img_uri = self.lru_album_img.hit(album_id)
                     if img_uri is None:
                         album = Album(session, album_id)
-                        img_uri = album.image(160)
+                        img_uri = album.image(320)
                         self.lru_album_img[album_id] = img_uri
 
                     uri_images = [Image(uri=img_uri, width=512, height=512)]
@@ -188,12 +188,11 @@ class TidalLibraryProvider(backend.LibraryProvider):
                     album_id = parts[3]
                     img_uri = self.lru_album_img.hit(album_id)
                     if img_uri is None:
-                        album = session.get_album(album_id)
-                        img_uri = album.image
+                        album = Album(session, album_id)
+                        img_uri = album.image(320)
                         self.lru_album_img[album_id] = img_uri
 
                     uri_images = [Image(uri=img_uri, width=512, height=512)]
-                    pass
 
             images[uri] = uri_images or ()
         return images
